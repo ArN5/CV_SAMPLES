@@ -25,7 +25,7 @@ while (1):
 
     # show the image frame and
     # wait for 1 milliseconds
-    # to check if user click "q"Qqq
+    # to check if user click "q"
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
     # if user clicks "q" then break out of the loop
