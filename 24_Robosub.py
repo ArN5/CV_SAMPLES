@@ -56,15 +56,6 @@ def nothing(x):
 # Creating a window for later use
 cv2.namedWindow('Main Panel')
 
-# Creating track bar
-# cv.CreateTrackbar(trackbarName, windowName, value, count, onChange)  None
-# cv2.createTrackbar('Hue', 'Control Panel', 0, 180, nothing)  # default 0 205 255 69 8 12
-# cv2.createTrackbar('Sat', 'Control Panel', 205, 255, nothing)
-# cv2.createTrackbar('Val', 'Control Panel', 255, 255, nothing)
-# cv2.createTrackbar('Hrange', 'Control Panel', 69, 127, nothing)
-# cv2.createTrackbar('Srange', 'Control Panel', 69, 127, nothing)
-# cv2.createTrackbar('Vrange', 'Control Panel', 69, 127, nothing)
-
 cv2.createTrackbar('frameNumber', 'Main Panel', frameNumber, TOTALFRAMES, nothing)  # default 0 205 255 69 8 12
 cv2.createTrackbar('Hue', 'Main Panel', 0, 180, nothing)  # default 0 205 255 69 8 12
 cv2.createTrackbar('Sat', 'Main Panel', 205, 255, nothing)
@@ -81,7 +72,6 @@ cv2.namedWindow('CannyEdge')
 cv2.createTrackbar('threshold-1', 'CannyEdge', 130, 1000, nothing)
 cv2.createTrackbar('threshold-2', 'CannyEdge', 80, 1000, nothing)
 
-
 # Creating a window for later use
 cv2.namedWindow('Sobel')
 
@@ -90,11 +80,8 @@ cv2.namedWindow('Sobel')
 cv2.createTrackbar('threshold-1', 'Sobel', 130, 1000, nothing)
 cv2.createTrackbar('threshold-2', 'Sobel', 80, 1000, nothing)
 
-
 # Creating track bar
 # cv.CreateTrackbar(trackbarName, windowName, value, count, onChange)  None
-
-
 
 def filterColor(frame):
     # create a new frame in
@@ -102,7 +89,6 @@ def filterColor(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     # /////////////////////////////
-
     # get info from track bar and apply to result
     # hue = cv2.getTrackbarPos('Hue', 'Control Panel')
     # sat = cv2.getTrackbarPos('Sat', 'Control Panel')
@@ -131,8 +117,6 @@ def filterColor(frame):
     filteredFrame = cv2.inRange(hsv, colorLower, colorUpper)
     # cv2.imshow('filteredFrame', filteredFrame)
 
-    colorCutout = cv2.bitwise_and(frame, frame, mask=filteredFrame)
-    #cv2.imshow('colorCutout', colorCutout)
 
     return filteredFrame
 
@@ -144,9 +128,7 @@ def findBiggestContours(frame, mask):
     # mask = cv2.blur(mask, (21, 21))
 
     # mask = cv2.medianBlur(mask, 5)
-    # cv2.imshow('mask', mask)
-
-
+    cv2.imshow('mask', mask)
 
     contoursArray = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
                                      cv2.CHAIN_APPROX_SIMPLE)[-2]
@@ -194,10 +176,9 @@ while frameNumber < TOTALFRAMES:
     # ///////////////////////////////////////////////////////////////////
 
     # ---------------------------------------
-    #findBiggestContours(frame, filterColor(frame))
-
-    # ///////////////////////////////////////////////////////////////////
-
+    mask = findBiggestContours(frame, filterColor(frame))
+    colorCutout = cv2.bitwise_and(frame, frame, mask=mask)
+    cv2.imshow('colorCutout', colorCutout)
     #---------------
     small = cv2.pyrDown(frameNormal)
     hsv = cv2.cvtColor(small, cv2.COLOR_BGR2HSV)
@@ -211,17 +192,13 @@ while frameNumber < TOTALFRAMES:
 
     gray = cv2.cvtColor(small, cv2.COLOR_BGR2GRAY)
 
-
-    gray = cv2.bilateralFilter(gray,7, 75, 75)
+    #gray = cv2.bilateralFilter(gray,7, 75, 75)
     #gray = cv2.medianBlur(gray, 3)
     gray = cv2.equalizeHist(gray)
     cv2.imshow('gray', gray)
 
-
     th_1 = cv2.getTrackbarPos('threshold-1', 'Sobel')
     th_2 = cv2.getTrackbarPos('threshold-2', 'Sobel')
-
-
 
     sob = cv2.Sobel(gray,cv2.CV_8U,1,0,ksize=3)
     edgesSob = cv2.Canny(sob, th_1, th_2)
@@ -231,9 +208,7 @@ while frameNumber < TOTALFRAMES:
     #sob = cv2.medianBlur(sob, 3)
     #sob = cv2.Laplacian(gray, cv2.CV_8U)
 
-
-    cv2.imshow('Sobel', edgesSob)
-
+    #cv2.imshow('Sobel', edgesSob)
 
     #ret,thresh = cv2.threshold(sob, 10, 255, cv2.THRESH_BINARY)
     #cv2.imshow('thresh', thresh)

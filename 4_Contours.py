@@ -20,13 +20,10 @@ cv2.createTrackbar('Val', 'Control Panel', 255, 255, nothing)
 cv2.createTrackbar('Hrange', 'Control Panel', 69, 127, nothing)
 cv2.createTrackbar('Srange', 'Control Panel', 69, 127, nothing)
 cv2.createTrackbar('Vrange', 'Control Panel', 69, 127, nothing)
+#----------------------------------------------------------------
 
-
-
-#/////////////////////////////
 
 def filterColor(frame):
-
     # create a new frame in
     # "Hue Saturation Value" or HSV color space
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)

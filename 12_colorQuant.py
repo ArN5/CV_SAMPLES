@@ -5,7 +5,7 @@ import numpy as np
 #https://docs.opencv.org/3.4.1/d1/d5c/tutorial_py_kmeans_opencv.html
 
 cap = cv2.VideoCapture(0)
-
+#cap = cv2.VideoCapture('Semi_Final_Run.mp4')
 # Initiate STAR detector
 orb = cv2.ORB_create()
 def nothing(x):
@@ -18,7 +18,6 @@ cv2.createTrackbar('value 1', 'Control Panel', 4, 10, nothing)
 cv2.createTrackbar('value 2', 'Control Panel', 10, 1000, nothing)
 cv2.createTrackbar('value 3', 'Control Panel', 10, 1000, nothing)
 
-
 while (1):
 
     val_1 = cv2.getTrackbarPos('value 1', 'Control Panel')
@@ -30,7 +29,7 @@ while (1):
     height, width, layers = frame.shape
 
     # comment this line if you want the fullsize window
-    img = cv2.resize(frame, (int(width / 10), int(height / 10)))
+    img = cv2.resize(frame, (int(width / 2), int(height / 2)))
 
     Z = img.reshape((-1, 3))
     # convert to np.float32

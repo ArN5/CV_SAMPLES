@@ -1,7 +1,7 @@
 import cv2
 
-cap = cv2.VideoCapture(0)
-
+#cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture('Semi_Final_Run.mp4')
 
 def findBiggestContour(mask):
     contoursArray = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
@@ -28,7 +28,7 @@ while (1):
 
 
 
-    ret, thresh = cv2.threshold(frameDelta,40,255,cv2.THRESH_BINARY)
+    ret, thresh = cv2.threshold(frameDelta,2,255,cv2.THRESH_BINARY)
     cv2.imshow("thresh", thresh)
     cv2.imshow('frame', frameDelta)
 
