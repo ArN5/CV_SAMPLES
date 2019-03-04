@@ -217,11 +217,8 @@ while frameNumber < TOTALFRAMES:
     gray = cv2.equalizeHist(gray)
     cv2.imshow('gray', gray)
 
-
     th_1 = cv2.getTrackbarPos('threshold-1', 'Sobel')
     th_2 = cv2.getTrackbarPos('threshold-2', 'Sobel')
-
-
 
     sob = cv2.Sobel(gray,cv2.CV_8U,1,0,ksize=3)
     edgesSob = cv2.Canny(sob, th_1, th_2)
@@ -231,9 +228,7 @@ while frameNumber < TOTALFRAMES:
     #sob = cv2.medianBlur(sob, 3)
     #sob = cv2.Laplacian(gray, cv2.CV_8U)
 
-
     cv2.imshow('Sobel', edgesSob)
-
 
     #ret,thresh = cv2.threshold(sob, 10, 255, cv2.THRESH_BINARY)
     #cv2.imshow('thresh', thresh)

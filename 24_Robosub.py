@@ -71,14 +71,10 @@ cv2.namedWindow('CannyEdge')
 # cv.CreateTrackbar(trackbarName, windowName, value, count, onChange)  None
 cv2.createTrackbar('threshold-1', 'CannyEdge', 130, 1000, nothing)
 cv2.createTrackbar('threshold-2', 'CannyEdge', 80, 1000, nothing)
-
-# Creating a window for later use
-cv2.namedWindow('Sobel')
-
 # Creating track bar
 # cv.CreateTrackbar(trackbarName, windowName, value, count, onChange)  None
-cv2.createTrackbar('threshold-1', 'Sobel', 130, 1000, nothing)
-cv2.createTrackbar('threshold-2', 'Sobel', 80, 1000, nothing)
+cv2.createTrackbar('threshold-3', 'CannyEdge', 130, 1000, nothing)
+cv2.createTrackbar('threshold-4', 'CannyEdge', 80, 1000, nothing)
 
 # Creating track bar
 # cv.CreateTrackbar(trackbarName, windowName, value, count, onChange)  None
@@ -166,10 +162,10 @@ while frameNumber < TOTALFRAMES:
     # ///////////////////////////////////////////////////////////////////
 
     # ---------------------------------------
-    th_1 = cv2.getTrackbarPos('threshold-1', 'Sobel')
-    th_2 = cv2.getTrackbarPos('threshold-2', 'Sobel')
-    th1 = cv2.getTrackbarPos('threshold-1', 'CannyEdge')
-    th2 = cv2.getTrackbarPos('threshold-2', 'CannyEdge')
+    th_1 = cv2.getTrackbarPos('threshold-1', 'CannyEdge')
+    th_2 = cv2.getTrackbarPos('threshold-2', 'CannyEdge')
+    th1 = cv2.getTrackbarPos('threshold-3', 'CannyEdge')
+    th2 = cv2.getTrackbarPos('threshold-4', 'CannyEdge')
 
     #small = cv2.pyrDown(frameNormal)
     small = frame
@@ -180,7 +176,7 @@ while frameNumber < TOTALFRAMES:
     mask = findBiggestContours(frame, colorMask)
 
     #combined = cv2.bitwise_and(mask, mask, mask=edges)
-    combined = cv2.addWeighted(colorMask, 0.7, edges, 0.3, 0)
+    combined = cv2.addWeighted(colorMask, 1.0, edges, 1.0, 0)
 
     cv2.imshow('combined', combined)
 
