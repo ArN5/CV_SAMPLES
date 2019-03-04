@@ -57,12 +57,12 @@ def nothing(x):
 cv2.namedWindow('Main Panel')
 
 cv2.createTrackbar('frameNumber', 'Main Panel', frameNumber, TOTALFRAMES, nothing)  # default 0 205 255 69 8 12
-cv2.createTrackbar('Hue', 'Main Panel', 0, 180, nothing)  # default 0 205 255 69 8 12
-cv2.createTrackbar('Sat', 'Main Panel', 205, 255, nothing)
-cv2.createTrackbar('Val', 'Main Panel', 255, 255, nothing)
-cv2.createTrackbar('Hrange', 'Main Panel', 69, 127, nothing)
-cv2.createTrackbar('Srange', 'Main Panel', 69, 127, nothing)
-cv2.createTrackbar('Vrange', 'Main Panel', 69, 127, nothing)
+cv2.createTrackbar('Hue', 'Main Panel', 73, 180, nothing)  # default 0 205 255 69 8 12
+cv2.createTrackbar('Sat', 'Main Panel', 75, 255, nothing)
+cv2.createTrackbar('Val', 'Main Panel', 102, 255, nothing)
+cv2.createTrackbar('Hrange', 'Main Panel', 53, 127, nothing)
+cv2.createTrackbar('Srange', 'Main Panel', 43, 127, nothing)
+cv2.createTrackbar('Vrange', 'Main Panel', 64, 127, nothing)
 
 # Creating a window for later use
 cv2.namedWindow('CannyEdge')
@@ -113,8 +113,9 @@ def filterColor(frame):
     # the lower hue will be 10-10 = 0 and upper hue will be 10+10=20.
 
     # /////////////////////////////
-
     filteredFrame = cv2.inRange(hsv, colorLower, colorUpper)
+    filteredFrame = cv2.dilate(filteredFrame, None)
+
     # cv2.imshow('filteredFrame', filteredFrame)
 
 
@@ -124,8 +125,7 @@ def findBiggestContours(frame, mask):
     # use our function that create a new frame with the color filtered
     # we will call it mask
     mask = filterColor(frame)
-    # mask = cv2.dilate(mask, None)
-    # mask = cv2.blur(mask, (21, 21))
+    mask = cv2.dilate(mask, None)
 
     # mask = cv2.medianBlur(mask, 5)
     cv2.imshow('mask', mask)
@@ -163,24 +163,31 @@ while frameNumber < TOTALFRAMES:
     # resize image
     frame = cv2.resize(frame, (int(width / divideFrameBy), int(height / divideFrameBy)))
 
-    # frame_1 = frame
-    # frame_1 = cv2.cvtColor(frame_1, cv2.COLOR_BGR2GRAY)
-    #
-    # ret, frame_2 = cap.read()
-    # frame_2 = cv2.resize(frame_2, (int(width / divideFrameBy), int(height / divideFrameBy)))
-    # frame_2 = cv2.cvtColor(frame_2, cv2.COLOR_BGR2GRAY)
-    # frameDelta = cv2.absdiff(frame_1, frame_2)
-    # et, frameDelta = cv2.threshold(frameDelta, 40, 255, cv2.THRESH_BINARY)
-    # cv2.imshow("movement", frameDelta)
-
     # ///////////////////////////////////////////////////////////////////
 
     # ---------------------------------------
-    mask = findBiggestContours(frame, filterColor(frame))
+    th_1 = cv2.getTrackbarPos('threshold-1', 'Sobel')
+    th_2 = cv2.getTrackbarPos('threshold-2', 'Sobel')
+    th1 = cv2.getTrackbarPos('threshold-1', 'CannyEdge')
+    th2 = cv2.getTrackbarPos('threshold-2', 'CannyEdge')
+
+    #small = cv2.pyrDown(frameNormal)
+    small = frame
+    gray = cv2.cvtColor(small, cv2.COLOR_BGR2GRAY)
+
+    edges = cv2.Canny(frame, th_1, th_2)
+    colorMask = filterColor(frame)
+    mask = findBiggestContours(frame, colorMask)
+
+    #combined = cv2.bitwise_and(mask, mask, mask=edges)
+    combined = cv2.addWeighted(colorMask, 0.7, edges, 0.3, 0)
+
+    cv2.imshow('combined', combined)
+
     colorCutout = cv2.bitwise_and(frame, frame, mask=mask)
     cv2.imshow('colorCutout', colorCutout)
-    #---------------
-    small = cv2.pyrDown(frameNormal)
+    #----------------------------------------------------
+
     hsv = cv2.cvtColor(small, cv2.COLOR_BGR2HSV)
     dark = hsv[..., 2] < 32
     hsv[dark] = 0
@@ -190,57 +197,9 @@ while frameNumber < TOTALFRAMES:
     vis = hsv_map * hist[:, :, np.newaxis] / 255.0
     cv2.imshow('hist', vis)
 
-    gray = cv2.cvtColor(small, cv2.COLOR_BGR2GRAY)
-
-    #gray = cv2.bilateralFilter(gray,7, 75, 75)
-    #gray = cv2.medianBlur(gray, 3)
-    gray = cv2.equalizeHist(gray)
-    cv2.imshow('gray', gray)
-
-    th_1 = cv2.getTrackbarPos('threshold-1', 'Sobel')
-    th_2 = cv2.getTrackbarPos('threshold-2', 'Sobel')
-
-    sob = cv2.Sobel(gray,cv2.CV_8U,1,0,ksize=3)
-    edgesSob = cv2.Canny(sob, th_1, th_2)
-    edgesSob = cv2.dilate(edgesSob, None)
-    #sob = cv2.Sobel(gray,cv2.CV_8U,0,1,ksize=3)
-    #sob = cv2.bilateralFilter(sob, 3, 175, 175)
-    #sob = cv2.medianBlur(sob, 3)
-    #sob = cv2.Laplacian(gray, cv2.CV_8U)
-
-    #cv2.imshow('Sobel', edgesSob)
-
-    #ret,thresh = cv2.threshold(sob, 10, 255, cv2.THRESH_BINARY)
-    #cv2.imshow('thresh', thresh)
-    # get info from the trackbars
-    th1 = cv2.getTrackbarPos('threshold-1', 'CannyEdge')
-    th2 = cv2.getTrackbarPos('threshold-2', 'CannyEdge')
-
-    edges = cv2.Canny(gray, th1, th2)
-    edges = cv2.dilate(edges, None)
-
-    cv2.imshow('CannyEdge', edges)
-    #cv2.imshow('edges', edges)
-
-    #combined = cv2.addWeighted(sob, 1.0, edges, 1, 0)
-
-    #combined = cv2.addWeighted(edges, 1.0, edgesSob, 1, 0)
-    combined= cv2.bitwise_and(edges, edges, mask=edgesSob)
-
-    # gray = cv2.equalizeHist(gray)
-    # edges = cv2.Canny(gray, 100, 200)
-    # combined = cv2.addWeighted(combined, 1.0, edges, 1, 0)
-
-    cv2.imshow('combined', combined)
 
     # -----------------------------------------------------
 
-    # gray32 = np.float32(gray)
-    # dst = cv2.cornerHarris(gray32, 10, 3, 0.05)
-
-    # #corners
-    # small[dst > 0.01 * dst.max()] = [255, 255, 255]
-    # cv2.imshow('small', small)
 
     # show the image frame
     cv2.imshow('Main Panel', frame)
